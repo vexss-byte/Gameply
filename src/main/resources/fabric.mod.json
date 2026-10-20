@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "id": "ritelock",
+  "version": "${version}",
+  "name": "RiteLock",
+  "description": "Cooldown Riptide trident, larangan netherite (non tools/armor) di storage, dan chat dimatikan.",
+  "authors": ["King"],
+  "license": "MIT",
+  "environment": "*",
+  "entrypoints": {
+    "main": ["com.king.ritelock.RiteLock"]
+  },
+  "mixins": ["ritelock.mixins.json"],
+  "depends": {
+    "fabricloader": ">=0.19.3",
+    "fabric-api": "*",
+    "minecraft": "*",
+    "java": ">=25"
+  }
+}
