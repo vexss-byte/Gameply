@@ -59,7 +59,7 @@ public final class Text {
                 if (f != null) {
                     flush(root, buf, style);
                     if (f == ChatFormatting.RESET) style = base;
-                    else if (f.isColor()) style = base.withColor(f);
+                    else if (f.getColor() != null) style = base.withColor(f);
                     else style = style.applyFormat(f);
                     i++;
                     continue;

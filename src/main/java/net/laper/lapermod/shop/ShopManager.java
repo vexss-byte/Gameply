@@ -2,6 +2,7 @@ package net.laper.lapermod.shop;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.UUID;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,7 +25,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerBossEvent;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Prediction;
 import net.minecraft.world.BossEvent;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -116,7 +117,7 @@ public final class ShopManager {
     private static void start(MinecraftServer server, boolean announce) {
         STORE.retainOnly(Set.of("ALWAYS", "EVENT-" + active.start().getEpochSecond()));
         if (bar == null) {
-            bar = new ServerBossEvent(Component.literal("LAPERSHOP"), BossEvent.BossBarColor.YELLOW, BossEvent.BossBarOverlay.PROGRESS);
+            bar = new ServerBossEvent(UUID.randomUUID(), Component.literal("LAPERSHOP"), BossEvent.BossBarColor.YELLOW, BossEvent.BossBarOverlay.PROGRESS);
         }
         bar.setVisible(true);
         for (ServerPlayer p : server.getPlayerList().getPlayers()) bar.addPlayer(p);
@@ -125,7 +126,7 @@ public final class ShopManager {
             server.getPlayerList().broadcastSystemMessage(announcement(cfg.openMessage), false);
             server.getPlayerList().broadcastSystemMessage(Text.legacy(cfg.openHint, false), false);
             for (ServerPlayer p : server.getPlayerList().getPlayers()) {
-                p.playNotifySound(SoundEvents.PLAYER_LEVELUP, SoundSource.PLAYERS, 0.8f, 1.0f);
+                p.playSound(SoundEvents.PLAYER_LEVELUP, 0.8f, 1.0f);
             }
         }
         LaperMod.LOGGER.info("LAPER SHOP dibuka sampai {}", active.end());
@@ -221,12 +222,12 @@ public final class ShopManager {
             }
             case LIMIT -> {
                 p.sendSystemMessage(Component.literal("Batas pembelian untuk penawaran ini sudah tercapai.").withStyle(ChatFormatting.RED));
-                p.playNotifySound(SoundEvents.VILLAGER_NO, SoundSource.PLAYERS, 1f, 1f);
+                p.playSound(SoundEvents.VILLAGER_NO, 1f, 1f);
                 return;
             }
             case FUNDS -> {
                 p.sendSystemMessage(Component.literal("Item pembayaran kamu tidak cukup.").withStyle(ChatFormatting.RED));
-                p.playNotifySound(SoundEvents.VILLAGER_NO, SoundSource.PLAYERS, 1f, 1f);
+                p.playSound(SoundEvents.VILLAGER_NO, 1f, 1f);
                 return;
             }
             case OK -> { }
@@ -251,7 +252,7 @@ public final class ShopManager {
 
         STORE.increment(scopeKey(o), p.getUUID(), o.id);
         p.sendSystemMessage(Component.literal("Pembelian berhasil!").withStyle(ChatFormatting.GREEN));
-        p.playNotifySound(SoundEvents.VILLAGER_YES, SoundSource.PLAYERS, 1f, 1f);
+        p.playSound(SoundEvents.VILLAGER_YES, 1f, 1f);
     }
 
     private static void give(ServerPlayer p, ItemStack stack) {
@@ -259,7 +260,7 @@ public final class ShopManager {
         while (!stack.isEmpty()) {
             ItemStack part = stack.split(Math.min(max, stack.getCount()));
             p.getInventory().add(part);
-            if (!part.isEmpty()) p.drop(part, false);
+            if (!part.isEmpty()) p.drop(part, false, Prediction.SERVER_ONLY);
         }
     }
 }

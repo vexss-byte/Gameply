@@ -23,7 +23,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -94,14 +94,14 @@ public final class CooldownManager {
      * Dipanggil oleh mixin sebelum klik inventory diproses. True = klik dibatalkan karena
      * menyentuh Trident Riptide yang sedang cooldown (ambil, shift-click, drop, swap hotbar/offhand).
      */
-    public static boolean isClickBlocked(ServerPlayer p, AbstractContainerMenu menu, int slotId, int button, ClickType type) {
+    public static boolean isClickBlocked(ServerPlayer p, AbstractContainerMenu menu, int slotId, int button, ContainerInput type) {
         if (!ConfigManager.get().cooldowns.lockTridentInInventory || !tridentLocked(p)) return false;
-        if (type == ClickType.QUICK_CRAFT) return isRiptideTrident(menu.getCarried());
-        if (type == ClickType.PICKUP_ALL && isRiptideTrident(menu.getCarried())) return true;
+        if (type == ContainerInput.QUICK_CRAFT) return isRiptideTrident(menu.getCarried());
+        if (type == ContainerInput.PICKUP_ALL && isRiptideTrident(menu.getCarried())) return true;
         if (slotId < 0 || slotId >= menu.slots.size()) return false;
         Slot slot = menu.slots.get(slotId);
         if (isRiptideTrident(slot.getItem())) return true;
-        if (type == ClickType.SWAP) {
+        if (type == ContainerInput.SWAP) {
             Inventory inv = p.getInventory();
             if (button >= 0 && button < inv.getContainerSize() && (button < 9 || button == 40)) {
                 return isRiptideTrident(inv.getItem(button));

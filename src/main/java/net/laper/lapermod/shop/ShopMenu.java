@@ -18,7 +18,7 @@ import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
@@ -66,15 +66,15 @@ public final class ShopMenu extends AbstractContainerMenu {
     // ------------------------------------------------------------------ klik
 
     @Override
-    public void clicked(int slotId, int button, ClickType type, Player player) {
+    public void clicked(int slotId, int button, ContainerInput type, Player player) {
         if (slotId >= 0 && slotId < SIZE) {
-            if ((type == ClickType.PICKUP || type == ClickType.QUICK_MOVE) && player instanceof ServerPlayer sp) {
+            if ((type == ContainerInput.PICKUP || type == ContainerInput.QUICK_MOVE) && player instanceof ServerPlayer sp) {
                 onTopClick(slotId, sp);
             }
             sendAllDataToRemote(); // batalkan prediksi klien
             return;
         }
-        if (type == ClickType.PICKUP_ALL) { // klik ganda tidak boleh "mengumpulkan" item tampilan
+        if (type == ContainerInput.PICKUP_ALL) { // klik ganda tidak boleh "mengumpulkan" item tampilan
             sendAllDataToRemote();
             return;
         }
@@ -111,7 +111,7 @@ public final class ShopMenu extends AbstractContainerMenu {
     }
 
     private void render() {
-        ItemStack filler = named(new ItemStack(Items.GRAY_STAINED_GLASS_PANE), Component.literal(" "));
+        ItemStack filler = named(new ItemStack(Items.STAINED_GLASS_PANE.gray()), Component.literal(" "));
         for (int i = 0; i < SIZE; i++) container.setItem(i, filler.copy());
         if (page >= pages()) page = pages() - 1;
 
@@ -151,11 +151,11 @@ public final class ShopMenu extends AbstractContainerMenu {
         ItemStack b;
         switch (st) {
             case OK -> {
-                b = named(new ItemStack(Items.LIME_STAINED_GLASS_PANE), Text.legacy("&a&lBELI", true));
+                b = named(new ItemStack(Items.STAINED_GLASS_PANE.lime()), Text.legacy("&a&lBELI", true));
                 lines.add(Text.legacy("&7Klik untuk membeli", true));
             }
             case FUNDS -> {
-                b = named(new ItemStack(Items.RED_STAINED_GLASS_PANE), Text.legacy("&c&lITEM KURANG", true));
+                b = named(new ItemStack(Items.STAINED_GLASS_PANE.red()), Text.legacy("&c&lITEM KURANG", true));
                 lines.add(Text.legacy("&7Kamu belum punya bahan pembayaran.", true));
             }
             default -> {

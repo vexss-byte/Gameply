@@ -14,7 +14,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -40,7 +40,7 @@ public final class RareDrops {
     public static void register() {
         // 1) Tandai kematian Evoker (semua Evoker, termasuk dari Raid). Drop terjadi di tick yang sama.
         ServerLivingEntityEvents.ALLOW_DEATH.register((entity, source, amount) -> {
-            if (entity.getType() == EntityType.EVOKER && entity.level() instanceof ServerLevel sl) {
+            if (entity.getType() == EntityTypes.EVOKER && entity.level() instanceof ServerLevel sl) {
                 long now = sl.getGameTime();
                 RECENT.removeIf(d -> now - d.tick() > 5);
                 RECENT.add(new EvokerDeath(sl, now, entity.position()));
@@ -84,7 +84,7 @@ public final class RareDrops {
     private static void handleFishedBook(ItemEntity item, ServerLevel world, ModConfig.Rarity cfg) {
         // Hasil memancing muncul tepat di posisi pelampung (bobber)
         List<Entity> hooks = world.getEntitiesOfClass(Entity.class, item.getBoundingBox().inflate(2.5),
-                e -> e.getType() == EntityType.FISHING_BOBBER);
+                e -> e.getType() == EntityTypes.FISHING_BOBBER);
         if (hooks.isEmpty()) return;
         if (ThreadLocalRandom.current().nextDouble() < cfg.fishingMendingKeepChance) return;
         item.setItem(withoutMending(item.getItem(), world));
@@ -94,7 +94,7 @@ public final class RareDrops {
         MerchantOffers offers = merchant.getOffers();
         // Tag unik per jumlah penawaran: pengecekan diulang hanya saat villager naik level (penawaran baru).
         String tag = "lapermod_mending_" + offers.size();
-        if (entity.getTags().contains(tag)) return;
+        if (entity.entityTags().contains(tag)) return;
         entity.addTag(tag);
         for (MerchantOffer offer : offers) {
             ItemStack result = offer.getResult();
