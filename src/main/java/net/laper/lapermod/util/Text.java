@@ -59,7 +59,7 @@ public final class Text {
                 if (f != null) {
                     flush(root, buf, style);
                     if (f == ChatFormatting.RESET) style = base;
-                    else if (f.getColor() != null) style = base.withColor(f);
+                    else if (isLegacyColor(f)) style = base.withColor(TextColor.fromRgb(legacyColorRgb(f)));
                     else style = style.applyFormat(f);
                     i++;
                     continue;
@@ -69,6 +69,42 @@ public final class Text {
         }
         flush(root, buf, style);
         return root;
+    }
+
+
+    /**
+     * Detect legacy palette colors without relying on ChatFormatting#getColor,
+     * whose availability differs between Minecraft mapping versions.
+     */
+    private static boolean isLegacyColor(ChatFormatting formatting) {
+        return switch (formatting) {
+            case BLACK, DARK_BLUE, DARK_GREEN, DARK_AQUA, DARK_RED, DARK_PURPLE,
+                 GOLD, GRAY, DARK_GRAY, BLUE, GREEN, AQUA, RED, LIGHT_PURPLE,
+                 YELLOW, WHITE -> true;
+            default -> false;
+        };
+    }
+
+    private static int legacyColorRgb(ChatFormatting formatting) {
+        return switch (formatting) {
+            case BLACK -> 0x000000;
+            case DARK_BLUE -> 0x0000AA;
+            case DARK_GREEN -> 0x00AA00;
+            case DARK_AQUA -> 0x00AAAA;
+            case DARK_RED -> 0xAA0000;
+            case DARK_PURPLE -> 0xAA00AA;
+            case GOLD -> 0xFFAA00;
+            case GRAY -> 0xAAAAAA;
+            case DARK_GRAY -> 0x555555;
+            case BLUE -> 0x5555FF;
+            case GREEN -> 0x55FF55;
+            case AQUA -> 0x55FFFF;
+            case RED -> 0xFF5555;
+            case LIGHT_PURPLE -> 0xFF55FF;
+            case YELLOW -> 0xFFFF55;
+            case WHITE -> 0xFFFFFF;
+            default -> throw new IllegalArgumentException("Not a legacy color: " + formatting);
+        };
     }
 
     private static boolean isHex(String s, int from, int to) {
