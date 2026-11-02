@@ -1,14 +1,10 @@
-name: Build Mod
+name: Build
 
 on:
   push:
-    branches: [ main, master ]
-    tags: [ 'v*' ]
+    branches: [main, master]
   pull_request:
-  workflow_dispatch:   # biar bisa dijalankan manual dari tab Actions
-
-permissions:
-  contents: write      # dibutuhkan untuk bikin Release
+  workflow_dispatch:
 
 jobs:
   build:
@@ -17,34 +13,25 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Java 25
+      - name: Setup JDK 25
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 25
 
-      # Pakai Gradle langsung, jadi tidak wajib ada gradlew di repo
-      - name: Setup Gradle
+      - name: Setup Gradle 9.6.0
         uses: gradle/actions/setup-gradle@v4
         with:
-          gradle-version: 9.5.1
+          gradle-version: 9.6.0
 
-      - name: Build
-        run: gradle build --no-daemon
+      - name: Build + test
+        run: gradle build --stacktrace
 
-      - name: Upload jar (Artifacts)
+      - name: Upload JAR
         uses: actions/upload-artifact@v4
         with:
-          name: ritelock-jar
+          name: lapermod-jar
           path: |
             build/libs/*.jar
             !build/libs/*-sources.jar
-
-      # Kalau push tag, contoh: git tag v1.0.0 && git push origin v1.0.0
-      - name: Create GitHub Release
-        if: startsWith(github.ref, 'refs/tags/v')
-        uses: softprops/action-gh-release@v2
-        with:
-          files: |
-            build/libs/*.jar
-            !build/libs/*-sources.jar
+          if-no-files-found: error
