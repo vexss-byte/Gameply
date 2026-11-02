@@ -25,7 +25,7 @@ jobs:
           gradle-version: 9.6.0
 
       - name: Build + test
-        run: gradle build --stacktrace
+        run: gradle clean build --no-daemon --stacktrace
 
       - name: Upload JAR
         uses: actions/upload-artifact@v4
